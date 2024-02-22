@@ -1,6 +1,6 @@
 
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import style from './style';
 import { FlatList, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,7 +19,28 @@ const Home = () => {
     const dispatch = useDispatch();
     // console.log(user.firstName = 'Hanafi');
     // dispatch(resetToInitialState());
-    console.log(categories);
+    // console.log(categories);
+    const [categoryPage, setCategoryPage] = useState(1);
+    const [categoryList, setCategoryList] = useState([]);
+    const [isLoadingCats, setIsLoadingCats] = useState(false);
+    const categoryPageSize = 4;
+
+    useEffect(() => {
+        setIsLoadingCats(true);
+        setCategoryList(pagination(categories.categories,categoryPage,categoryPageSize));
+        setCategoryPage(prev => prev + 1);
+        setIsLoadingCats(false);
+    },[])
+
+    const pagination = (items, pageNumber, pageSize) => {
+        const startIndex = (pageNumber - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        if(startIndex >= items.length){
+            return [];
+        }
+        return items.slice(startIndex,endIndex);
+    }
+    
     return (
         <SafeAreaView style={[globalStyle.backgroundWhite, globalStyle.flex]}>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -45,9 +66,21 @@ const Home = () => {
                 </View>
                 <View style={style.categories}>
                     <FlatList 
+                    onEndReachedThreshold={0.5}
+                    onEndReached={() => {
+                        if(isLoadingCats) return;
+                        console.log('reach end,get more data', categoryPage)
+                        setIsLoadingCats(true);
+                        let newData = pagination(categories.categories, categoryPage, categoryPageSize);
+                        if(newData.length > 0){
+                            setCategoryList(prevState => [...prevState, ...newData]);
+                            setCategoryPage(prevState => prevState + 1);
+                        }
+                        setIsLoadingCats(false);
+                    }}
                     horizontal={true}
                     showsHorizontalScrollIndicator={false}
-                    data={categories.categories} renderItem={({item}) => (
+                    data={categoryList} renderItem={({item}) => (
                         <View  key={item.categoryId} style={style.categoryItem}>
                             <Tab 
                             tabId={item.categoryId}
