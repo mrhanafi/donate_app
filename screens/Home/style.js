@@ -33,7 +33,18 @@ const style = StyleSheet.create({
     },
     highlightedImage: {
         width: '100%',
-        height: verticalScale(160)
+        height: verticalScale(160),
+    },
+    categories: {
+        marginLeft: horizontalScale(24),
+    },
+    categoryItem: {
+        marginRight: horizontalScale(10),
+    },
+    categoryHeader: {
+        marginHorizontal: horizontalScale(24),
+        marginBottom: verticalScale(16),
+        marginTop: verticalScale(6)
     }
 });
 
